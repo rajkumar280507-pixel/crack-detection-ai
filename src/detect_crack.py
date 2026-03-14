@@ -2,6 +2,11 @@ import tensorflow as tf
 import cv2
 import numpy as np
 import os
+import sys
+
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.preprocessing import enhance_image, get_binary_mask
 from src.severity_analysis import analyze_crack_severity
 from src.visualization import visualize_results
