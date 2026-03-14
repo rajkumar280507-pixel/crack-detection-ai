@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crack Detection AI | Structural Health Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a1c1e;
+            --secondary: #2c2e33;
+            --accent: #c9a063; /* Architectural Gold */
+            --accent-glow: rgba(201, 160, 99, 0.4);
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            --bg: #121416;
+            --card: #1c1e22;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --header-height: 80px;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            background-image: linear-gradient(180deg, #1a1c1e 0%, #121416 100%);
+            letter-spacing: -0.01em;
+        }
+
+        header {
+            background: rgba(26, 28, 30, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201, 160, 99, 0.1);
+        }
+
+        .logo span { color: var(--accent); }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(201, 160, 99, 0.2);
+        }
+
+        .metric-tile {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        .metric-tile span { color: var(--accent); opacity: 0.8; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header Styling */
+        header {
+            height: var(--header-height);
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            flex-wrap: nowrap;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: calc(var(--header-height) + 1rem);
+            padding: 0 4%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 0 1rem; flex-direction: column; height: auto; padding-bottom: 0.5rem; }
+            .logo { margin-top: 0.5rem; font-size: 1.2rem; }
+            .nav-links { gap: 0.5rem; width: 100%; overflow-x: auto; padding-bottom: 0.5rem; justify-content: flex-start; scrollbar-width: none; }
+            .nav-item { white-space: nowrap; font-size: 0.8rem; padding: 0.4rem 0.6rem; }
+            main { margin-top: 100px; padding: 0 1rem; }
+            .hero-section { padding: 1.5rem; }
+            .hero-section h2 { font-size: 1.5rem; }
+            .upload-card { padding: 1.5rem; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .image-compare { grid-template-columns: 1fr; }
+            .login-box { padding: 1.5rem; border-radius: 1rem; max-width: 90%; }
+            .data-table { display: block; overflow-x: auto; }
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            color: white;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero-section h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .hero-section p { opacity: 0.8; max-width: 600px; margin: 0 auto 2rem; font-weight: 300; }
+
+        /* Upload Card */
+        .upload-card {
+            background: var(--card);
+            border: 2px dashed #cbd5e1;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            transition: border-color 0.3s, transform 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+        .upload-card input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn-upload {
+            background: var(--accent);
+            color: #1a1c1e;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--accent-glow);
+            transition: all 0.3s ease;
+        }
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+            filter: brightness(1.1);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .visual-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h3 { margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
+
+        .image-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .image-compare img {
+            width: 100%;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            object-fit: cover;
+            aspect-ratio: 1/1;
+        }
+
+        /* Analysis Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-tile {
+            background: var(--bg);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .metric-tile span { font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
+        .metric-tile div { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+        /* Severity/Status */
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-none { background: #d1fae5; color: #065f46; }
+        .badge-mild { background: #dbeafe; color: #1e40af; }
+        .badge-moderate { background: #fef3c7; color: #92400e; }
+        .badge-severe { background: #fee2e2; color: #991b1b; }
+        .badge-critical { background: #450a0a; color: #ffffff; }
+
+        /* Recommendation Section */
+        .recommendation-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: #f8fafc;
+            border-left: 5px solid var(--accent);
+        }
+
+        .recommendation-box h4 { margin-bottom: 0.5rem; color: var(--primary); }
+        .recommendation-box p { font-size: 0.95rem; color: #475569; }
+
+        .action-tag {
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Login Overlay */
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .login-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            text-align: center;
+            margin: auto;
+        }
+        .login-box h2 { color: var(--primary); margin-bottom: 0.25rem; font-size: 1.5rem; }
+        .login-box p { color: #64748b; margin-bottom: 1.5rem; font-size: 0.85rem; }
+        .input-group { text-align: left; margin-bottom: 1.25rem; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 4px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 0.7rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; font-family: inherit; font-size: 0.9rem; }
+        .login-btn { width: 100%; background: var(--accent); color: #1a1c1e; border: none; padding: 0.9rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; }
+        .login-btn:hover { background: #d4af37; transform: translateY(-2px); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Navigation Tabs */
+        .nav-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+        .nav-item:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+        .nav-item.active {
+            opacity: 1;
+            background: rgba(255,255,255,0.15);
+            color: var(--accent-light);
+            font-weight: 700;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        /* History & Reports Table */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .data-table th { background: #f8fafc; padding: 1rem; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 0.8rem; text-transform: uppercase; color: #64748b; }
+        .data-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .data-table tr:hover { background: #f8fafc; }
+
+        /* Settings Grid */
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-info h5 { margin: 0; font-size: 1rem; color: var(--primary); }
+        .settings-info p { margin: 0; font-size: 0.8rem; color: #64748b; }
+
+        /* Header responsiveness */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: var(--header-bg);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: nowrap; /* Prevent wrapping */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: nowrap; /* Prevent wrapping */
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .nav-links {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-around;
+                gap: 0.5rem;
+                flex-wrap: wrap; /* Allow wrapping on smaller screens for nav items */
+            }
+            .nav-item {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+            .upload-card {
+                padding: 2rem;
+            }
+            .login-box {
+                padding: 2rem;
+                margin: 0 1rem;
+            }
+            .image-compare {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-upload {
+                width: 100%;
+                padding: 0.7rem 1.5rem;
+            }
+            .data-table th, .data-table td {
+                padding: 0.8rem;
+                font-size: 0.85rem;
+            }
+            .settings-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+<script>
+    function showTab(tabId, event) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabId).classList.add('active');
+        if (event) {
+            event.currentTarget.classList.add('active');
+        } else {
+            // Default to matching nav item if event is missing (e.g. on load)
+            const navItem = document.querySelector(`.nav-item[onclick*="${tabId}"]`);
+            if (navItem) navItem.classList.add('active');
+        }
+        
+        // Save current tab to localStorage
+        localStorage.setItem('activeTab', tabId);
+    }
+</script>
+</head>
+<body data-has-results="{{ 'true' if original_img else 'false' }}">
+    <header>
+        <div class="logo">
+            <i data-lucide="shield-check"></i>
+            Crack<span>Detection AI</span>
+        </div>
+    <div class="nav-links">
+        <span class="nav-item active" onclick="showTab('dashboard', event)">Dashboard</span>
+        <span class="nav-item" onclick="showTab('live', event)"><span style="display:inline-block; width:8px; height:8px; background:red; border-radius:50%; margin-right:5px; animation: pulse 1s infinite;"></span> Live</span>
+        <span class="nav-item" onclick="showTab('history', event)">History</span>
+        <span class="nav-item" onclick="showTab('reports', event)">Reports</span>
+        <span class="nav-item" onclick="showTab('settings', event)">Settings</span>
+    </div>
+</header>
+
+<main>
+    <!-- Dashboard Section -->
+    <div id="tab-dashboard" class="tab-content active">
+        {% if not original_img %}
+        <div class="hero-section">
+            <h2>Intelligent Structural Health Monitoring</h2>
+            <p>Advanced AI-driven platform for automated crack detection & infrastructure assessment. Certified for high-precision civil engineering inspections.</p>
+            
+            <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                <div class="upload-card">
+                    <i data-lucide="upload-cloud" style="width: 48px; height: 48px; color: var(--accent); margin-bottom: 1rem;"></i>
+                    <p>Tap to <strong>Open Camera</strong> or browse files</p>
+                <span style="font-size: 0.8rem; color: #94a3b8;">Direct site-inspection mode enabled</span>
+                <input type="file" name="file" id="mobileCameraInput" accept="image/*" onchange="document.getElementById('uploadForm').submit()">
+                </div>
+                <button type="submit" class="btn-upload">Begin Analysis</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if original_img %}
+        <div class="dashboard-grid fade-in">
+            <div class="visual-panel">
+                <div class="card">
+                    <h3><i data-lucide="layers"></i> Analysis Viewports</h3>
+                    <div class="image-compare">
+                        <div>
+                            <small style="display: block; margin-bottom: 5px; color: #64748b;">Original Inspection Frame</small>
+                            <img src="{{ url_for('static', filename='uploads/' + original_img) }}" alt="Original">
+                        </div>
+                        <div>
+                            <small style="display: block; margin-bottom: 5px; color: #64748b;">Detection Heatmap & Skeleton</small>
+                            <img src="{{ url_for('static', filename='uploads/' + processed_img) }}" alt="Processed">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i data-lucide="clipboard-list"></i> Structural Inspection Report</h3>
+                    <div class="recommendation-box">
+                        <span class="action-tag">{{ report.recommended_action }}</span>
+                        <h4>Engineer Summary</h4>
+                        <p>{{ report.detailed_recommendation }}</p>
+                    </div>
+                    <div style="margin-top: 1.5rem; display: flex; justify-content: space-between;">
+                        <button class="btn-upload" style="background: #e2e8f0; color: #475569; padding: 0.5rem 1rem;"><i data-lucide="download" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;"></i> Export PDF Report</button>
+                        <button class="btn-upload" style="padding: 0.5rem 1rem;" onclick="window.location.href='/'">New Inspection</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <div class="card">
+                    <h3><i data-lucide="activity"></i> Structural Inspection Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-tile">
+                            <span>Detected Defect Type</span>
+                            <div>{{ label }}</div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Detection Confidence</span>
+                            <div>{{ (score|float * 100)|round(2) }}%</div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Surface Crack Coverage</span>
+                            <div>{{ report.density_percentage }}%</div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Analysis Precision</span>
+                            <div style="color: var(--accent);">High Density Scan</div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Site Report Status</span>
+                            <div style="color: var(--success);">READY FOR EXPORT</div>
+                        </div>
+                    </div>
+
+                    <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #f1f5f9;">
+
+                    <h3><i data-lucide="ruler"></i> Crack Geometry Summary</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-tile">
+                            <span>Estimated Total Crack Length</span>
+                            <div><span id="val-length" data-px="{{ report.estimated_length_px }}">{{ report.estimated_length_px }}</span> <span class="unit-label">px</span></div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Estimated Average Crack Width</span>
+                            <div><span id="val-width" data-px="{{ report.avg_width_px }}">{{ report.avg_width_px }}</span> <span class="unit-label">px</span></div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Detected Crack Regions</span>
+                            <div>{{ report.crack_count }} Regions</div>
+                        </div>
+                        <div class="metric-tile">
+                            <span>Crack Pattern Type</span>
+                            <div>{{ "Linear/Structural" if report.has_linear_structure else "Isolated/Blob" }}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 1rem; text-align: center;">
+                        <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 600;">ESTIMATED STRUCTURAL RISK</p>
+                        <div class="status-badge badge-{{ report.severity_level|lower }}">
+                            {{ report.severity_level }} SEVERITY
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Live Inspection Tab -->
+    <div id="tab-live" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3><i data-lucide="video"></i> Real-Time AI Inspection</h3>
+                <span class="status-badge badge-severe" style="background:#fee2e2; color:#ef4444; border:1px solid #fecaca;">LIVE STREAM ENABLED</span>
+            </div>
+            <div style="background: #000; border-radius: 1rem; overflow: hidden; position: relative; aspect-ratio: 16/9;">
+                <img id="live-feed" src="{{ url_for('video_feed') }}" style="width: 100%; height: 100%; object-fit: contain;" alt="Live Video Feed">
+                <div style="position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 5px;">
+                    <div id="live-fps" style="background: rgba(0,0,0,0.6); color: #4ade80; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">FPS: 32</div>
+                    <div id="live-objects" style="background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">DETECTED: --</div>
+                </div>
+                <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; color: #fff; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px; font-size: 0.75rem;">
+                    <i data-lucide="info" style="width:14px; height:14px; vertical-align:middle; margin-right:5px;"></i>
+                    <strong id="live-status">SERVER-SIDE FEED ACTIVE</strong><br>
+                    <span style="opacity: 0.8;">Note: This shows the laptop/server camera. For mobile-site inspection, use the "Dashboard" upload.</span>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button class="btn-upload" style="margin:0; width:100%;" onclick="toggleStream('start')"><i data-lucide="play"></i> Start/Switch Cam</button>
+                <button class="btn-upload" style="margin:0; width:100%; background:#e2e8f0; color:#475569;" onclick="toggleStream('stop')"><i data-lucide="square"></i> Stop Stream</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Tab -->
+    <div id="tab-history" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3><i data-lucide="history"></i> Inspection History</h3>
+                <div style="display: flex; gap: 10px;">
+                    <select class="btn-upload" style="background: white; color: var(--text); border: 1px solid #ddd; padding: 0.5rem; margin: 0;">
+                        <option>All Site Locations</option>
+                        <option>Bridge Project A</option>
+                        <option>Tunnel Section B</option>
+                    </select>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Defect Type</th>
+                        <th>Confidence</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="background: #f1f5f9; padding: 2px 5px; border-radius: 4px;">#INS-7721</code></td>
+                        <td>Structural Crack</td>
+                        <td>94.2%</td>
+                        <td><span class="status-badge badge-severe">Severe</span></td>
+                        <td><span style="color: var(--success);">● Verified</span></td>
+                        <td><button class="btn-upload" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Review</button></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background: #f1f5f9; padding: 2px 5px; border-radius: 4px;">#INS-7690</code></td>
+                        <td>Hairline Defect</td>
+                        <td>88.1%</td>
+                        <td><span class="status-badge badge-mild">Mild</span></td>
+                        <td><span style="color: var(--success);">● Verified</span></td>
+                        <td><button class="btn-upload" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Review</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div id="tab-reports" class="tab-content">
+        <div class="card">
+            <h3><i data-lucide="file-text"></i> Compliance Reports</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+                <div class="recommendation-box">
+                    <div style="display: flex; justify-content: space-between;">
+                        <h4 style="margin: 0;">Site Inspection: Section B-2</h4>
+                        <span class="status-badge badge-moderate">Moderate</span>
+                    </div>
+                    <p style="font-size: 0.8rem; margin: 0.5rem 0;">A detailed assessment of structural integrity following AI analysis of surface defects.</p>
+                    <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #e2e8f0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <small>Ref: #REP-2024-001</small>
+                        <button class="btn-upload" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Open PDF</button>
+                    </div>
+                </div>
+                <div class="recommendation-box">
+                    <div style="display: flex; justify-content: space-between;">
+                        <h4 style="margin: 0;">Column Stability Report</h4>
+                        <span class="status-badge badge-none">Pass</span>
+                    </div>
+                    <p style="font-size: 0.8rem; margin: 0.5rem 0;">Baseline inspection for quarterly maintenance compliance.</p>
+                    <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #e2e8f0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <small>Ref: #REP-2024-002</small>
+                        <button class="btn-upload" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Open PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="tab-settings" class="tab-content">
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3><i data-lucide="sliders"></i> Inspection Parameters</h3>
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <h5>Crack Detection Sensitivity</h5>
+                        <p>Adjust threshold for noise filtering in surface texture.</p>
+                    </div>
+                    <input type="range" style="width: 100px;">
+                </div>
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <h5>Camera Source</h5>
+                        <p>Select input for live inspection.</p>
+                    </div>
+                    <select id="camera-selector" style="padding: 0.3rem; border-radius: 4px;">
+                        <option value="0">Default (Integrated)</option>
+                        <option value="1">External / Phone Cam</option>
+                        <option value="2">USB Inspection Cam</option>
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <h5>Measurement Unit</h5>
+                        <p>Default unit for report generation.</p>
+                    </div>
+                    <select id="unit-selector" onchange="updateUnits()" style="padding: 0.3rem; border-radius: 4px;">
+                        <option value="px">Pixels (px)</option>
+                        <option value="mm">Millimeters (mm)</option>
+                        <option value="cm">Centimeters (cm)</option>
+                        <option value="m">Meters (m)</option>
+                        <option value="in">Inches (in)</option>
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <h5>Auto-Classification</h5>
+                        <p>Enable AI-led structural risk assessment.</p>
+                    </div>
+                    <input type="checkbox" checked>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i data-lucide="user"></i> Inspector Account</h3>
+                <div style="text-align: center; padding: 1rem 0;">
+                    <div style="width: 60px; height: 60px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="user" style="color: #64748b;"></i>
+                    </div>
+                    <h4 style="margin: 0;">Lead Civil Engineer</h4>
+                    <p style="font-size: 0.8rem; color: #64748b;">ID: CE-99210-A</p>
+                    <button class="btn-upload" style="width: 100%; margin-top: 1.5rem;">Update Profile</button>
+                    <button class="btn-upload" style="width: 100%; background: white; color: var(--danger); border: 1px solid #fee2e2; margin-top: 0.5rem;" onclick="location.reload();">Refresh Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    lucide.createIcons();
+
+    // Consolidated Core Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        // Overlay logic removed as requested
+
+        // 1. Load Saved State
+        const savedTab = localStorage.getItem('activeTab');
+        const savedUnit = localStorage.getItem('selectedUnit') || 'px';
+        const hasResults = document.body.dataset.hasResults === 'true';
+        
+        // Restore saved unit
+        const unitSelector = document.getElementById('unit-selector');
+        if (unitSelector) {
+            unitSelector.value = savedUnit;
+            updateUnits(); 
+        }
+
+        // 2. Navigate to appropriate section
+        if (hasResults) {
+            showTab('dashboard'); 
+        } else if (savedTab) {
+            showTab(savedTab);
+        } else {
+            showTab('dashboard'); 
+        }
+    });
+
+    function showTab(tabId, event) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        
+        const targetTab = document.getElementById('tab-' + tabId);
+        if (targetTab) targetTab.classList.add('active');
+        
+        if (event) {
+            event.currentTarget.classList.add('active');
+        } else {
+            const navItem = document.querySelector(`.nav-item[onclick*="${tabId}"]`);
+            if (navItem) navItem.classList.add('active');
+        }
+        
+        localStorage.setItem('activeTab', tabId);
+    }
+
+    function updateUnits() {
+        const unitSelector = document.getElementById('unit-selector');
+        if (!unitSelector) return;
+        
+        const unit = unitSelector.value;
+        localStorage.setItem('selectedUnit', unit);
+        
+        const pxToMm = 0.2646; // Baseline
+        
+        document.querySelectorAll('[data-px]').forEach(el => {
+            const pxValue = parseFloat(el.getAttribute('data-px'));
+            let converted;
+            let decimals = 2;
+
+            switch(unit) {
+                case 'mm': converted = pxValue * pxToMm; break;
+                case 'cm': converted = pxValue * pxToMm / 10; break;
+                case 'm':  converted = pxValue * pxToMm / 1000; decimals = 4; break;
+                case 'in': converted = pxValue * pxToMm / 25.4; break;
+                default:   converted = pxValue; decimals = 1;
+            }
+            
+            el.innerText = converted.toFixed(decimals);
+        });
+
+        document.querySelectorAll('.unit-label').forEach(el => {
+            el.innerText = unit;
+        });
+    }
+
+    function toggleStream(status) {
+        const feed = document.getElementById('live-feed');
+        const subSelector = document.getElementById('camera-selector');
+        if(!feed || !subSelector) return;
+
+        const camId = subSelector.value;
+        if(status === 'stop') {
+            feed.src = "";
+            document.getElementById('live-status').innerText = "System Idle";
+        } else {
+            feed.src = "{{ url_for('video_feed') }}?cam=" + camId;
+            document.getElementById('live-status').innerText = "Acquiring Stream...";
+        }
+    }
+</script>
+</body>
+</html>
